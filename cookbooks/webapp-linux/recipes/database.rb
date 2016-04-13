@@ -53,7 +53,8 @@ mysql_database_user node['webapp-linux']['database']['app']['username'] do
   password db_admin_password_data_bag_item['password']
   database_name mysql_db
   host mysql_host
-  action :create
+  privileges [:select,:update,:insert,:delete]
+  action :grant 
 end
 
 cookbook_file node['webapp-linux']['database']['seed_file'] do
@@ -66,7 +67,7 @@ end
 
 execute 'initialize database' do 
   command "mysql -h #{mysql_host} -u #{mysql_user} -p#{root_password_data_bag_item['password']} -D #{mysql_db} --socket=#{mysql_socket} < #{node['webapp-linux']['database']['seed_file']}"
-  not_if "mysql -h #{mysql_host} -u #{mysql_user} -p#{root_password_data_bag_item['password']} -D #{mysql_db} --socket=#{mysql_socket} -e 'describe_customers;'"
+  not_if "mysql -h #{mysql_host} -u #{mysql_user} -p#{root_password_data_bag_item['password']} -D #{mysql_db} --socket=#{mysql_socket} -e 'describe customers;'"
   action :run
 end
 
